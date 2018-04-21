@@ -10,30 +10,33 @@ let getTime = (seconds) => {
     date.getSeconds(seconds);
     return date.toISOString().substr(11, 8);
 }
+let getData = () => {
+    endpoint.onopen = function (event) {
+        console.log("Connection Established");
+        endpoint.send(data);
+    }
 
-endpoint.onopen = function (event) {
-    console.log("Connection Established");
-    endpoint.send(data);
-}
+    endpoint.onmessage = function (event) {
+        obj = JSON.parse(event.data);
+        trades = obj.trades;
+        console.log(trades)
 
-endpoint.onmessage = function (event) {
-    obj = JSON.parse(event.data);
-    trades = obj.trades;
-    console.log(trades)
+        trades.forEach((element, index) => {
 
-    trades.forEach((element, index) => {
-
-        table.innerHTML +=`<tr><td> ${element.price} </td>
+            table.innerHTML += `<tr><td> ${element.price} </td>
                             <td> ${element.qty} </td>
                             <td> ${element.product_id} </td>
                             <td> ${getTime(element.time)} </td></tr>`;
 
-    });
-    
- 
+        });
 
+
+
+    }
+
+    endpoint.onclose = function (event) {
+        console.log("Connection Closed")
+    }
 }
 
-endpoint.onclose = function (event) {
-    console.log("Connection Closed")
-}
+setInterval(getData, 1000);
