@@ -57,3 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
+# Ignore Node Modules
+node_modules
+
+# Sass Cache
+.sass-cache
+
+.DS_Store
+
