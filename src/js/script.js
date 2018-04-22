@@ -1,42 +1,46 @@
 let endpoint = new WebSocket("wss://www.cryptofacilities.com/ws/v1");
 let data = '{"event":"subscribe","feed":"trade","product_ids":["FI_XBTUSD_180615"]}'
+let table = document.getElementById("table");
+let h1 = document.getElementById("title");
 let obj;
 let trades;
-let table = document.getElementById("table");
 
-let date = new Date();
+let getTime = (miliseconds) => {
 
-let getTime = (seconds) => {
-    date.getSeconds(seconds);
-    return date.toISOString().substr(11, 8);
+    let milliseconds = Math.floor((miliseconds % 1000) / 100)
+    let seconds = Math.floor((miliseconds / 1000) % 60)
+    let minutes = Math.floor((miliseconds / (1000 * 60)) % 60)
+    let hours = Math.floor((miliseconds / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return `${hours}:${minutes}:${seconds}`;
 }
-let getData = () => {
-    endpoint.onopen = function (event) {
-        console.log("Connection Established");
-        endpoint.send(data);
-    }
 
-    endpoint.onmessage = function (event) {
-        obj = JSON.parse(event.data);
-        trades = obj.trades;
-        console.log(trades)
+endpoint.onopen = function (event) {
+    console.log("Connection Established");
+    endpoint.send(data);
+}
 
-        trades.forEach((element, index) => {
+endpoint.onmessage = function (event) {
+    obj = JSON.parse(event.data);
+    trades = obj.trades;
 
-            table.innerHTML += `<tr><td> ${element.price} </td>
+    if (trades != '') { h1.innerHTML = "Trade Snapshot";
+    } else { h1.innerHTML = "List Empty"; }
+    
+    trades.forEach((element, index) => {
+
+        table.innerHTML += `<tr><td> ${element.price} </td>
                             <td> ${element.qty} </td>
                             <td> ${element.product_id} </td>
                             <td> ${getTime(element.time)} </td></tr>`;
+    });
 
-        });
-
-
-
-    }
-
-    endpoint.onclose = function (event) {
-        console.log("Connection Closed")
-    }
 }
 
-setInterval(getData, 1000);
+endpoint.onclose = function (event) {
+    console.log("Connection Closed")
+}
