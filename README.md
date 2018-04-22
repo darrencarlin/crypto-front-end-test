@@ -1,5 +1,5 @@
 # crypto-front-end-test
-test app for front-end position
+test app for front-end position ( I am not applying for this position, I just wanted to give it a try) 
 
 
 See
